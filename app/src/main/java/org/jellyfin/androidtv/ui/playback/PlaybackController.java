@@ -251,8 +251,12 @@ public class PlaybackController implements PlaybackControllerNotifiable {
             if (mFragment != null)
                 Utils.showToast(mFragment.getContext(), mFragment.getString(R.string.player_error));
             Timber.i("Player error encountered - retrying");
+            // Jellyfin SW: play() resets mCurrentPosition to 0 and keeps the requested start in
+            // mSeekPosition, so an error before playback really started would retry from 0 and
+            // lose the resume position.
+            long retryPosition = mCurrentPosition <= 0 && mSeekPosition > 0 ? mSeekPosition : mCurrentPosition;
             stop();
-            play(mCurrentPosition);
+            play(retryPosition);
         } else {
             mPlaybackState = PlaybackState.ERROR;
             if (mFragment != null) {

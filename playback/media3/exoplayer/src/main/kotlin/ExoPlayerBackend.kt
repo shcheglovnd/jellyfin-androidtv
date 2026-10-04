@@ -21,6 +21,7 @@ import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
 import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
 import androidx.media3.exoplayer.util.EventLogger
 import androidx.media3.extractor.DefaultExtractorsFactory
+import org.jellyfin.playback.media3.exoplayer.mkv.PatchedMatroskaExtractorsFactory
 import androidx.media3.extractor.ts.TsExtractor
 import androidx.media3.ui.SubtitleView
 import org.jellyfin.playback.core.backend.BasePlayerBackend
@@ -71,7 +72,8 @@ class ExoPlayerBackend(
 			setConstantBitrateSeekingAlwaysEnabled(true)
 		}
 
-		val mediaSourceFactory = DefaultMediaSourceFactory(dataSourceFactory, extractorsFactory)
+		// Jellyfin SW: patched Matroska extractor (finds Cues behind a nested SeekHead)
+		val mediaSourceFactory = DefaultMediaSourceFactory(dataSourceFactory, PatchedMatroskaExtractorsFactory(extractorsFactory))
 		val renderersFactory = DefaultRenderersFactory(context).apply {
 			setEnableDecoderFallback(true)
 			setExtensionRendererMode(

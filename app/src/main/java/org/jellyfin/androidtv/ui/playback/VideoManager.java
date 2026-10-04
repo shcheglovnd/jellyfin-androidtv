@@ -38,6 +38,7 @@ import androidx.media3.exoplayer.source.DefaultMediaSourceFactory;
 import androidx.media3.exoplayer.trackselection.DefaultTrackSelector;
 import androidx.media3.exoplayer.util.EventLogger;
 import androidx.media3.extractor.DefaultExtractorsFactory;
+import org.jellyfin.playback.media3.exoplayer.mkv.PatchedMatroskaExtractorsFactory;
 import androidx.media3.extractor.ts.TsExtractor;
 import androidx.media3.ui.AspectRatioFrameLayout;
 import androidx.media3.ui.CaptionStyleCompat;
@@ -219,7 +220,8 @@ public class VideoManager {
         extractorsFactory.setConstantBitrateSeekingAlwaysEnabled(true);
         DefaultDataSource.Factory dataSourceFactory = new DefaultDataSource.Factory(context, exoPlayerHttpDataSourceFactory);
         exoPlayerBuilder.setRenderersFactory(defaultRendererFactory);
-        exoPlayerBuilder.setMediaSourceFactory(new DefaultMediaSourceFactory(dataSourceFactory, extractorsFactory));
+        // Jellyfin SW: patched Matroska extractor (finds Cues behind a nested SeekHead)
+        exoPlayerBuilder.setMediaSourceFactory(new DefaultMediaSourceFactory(dataSourceFactory, new PatchedMatroskaExtractorsFactory(extractorsFactory)));
 
         exoPlayerBuilder.setAudioAttributes(new AudioAttributes.Builder()
                 .setUsage(C.USAGE_MEDIA)
